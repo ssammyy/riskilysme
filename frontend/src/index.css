@@ -1,0 +1,83 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Design tokens from DESIGN.md (repo root), expressed as HSL for shadcn/ui.
+ *   canvas  #fffefb  ·  canvas-soft #f8f4f0  ·  ink #201515
+ *   primary #ff4f00  ·  body #605d52  ·  mute #c5c0b1
+ * The brand is light-first; a dark scaffold is provided for completeness.
+ */
+@layer base {
+  :root {
+    --background: 48 100% 99%; /* canvas #fffefb */
+    --foreground: 0 20% 10%; /* ink #201515 */
+
+    --card: 30 36% 96%; /* canvas-soft #f8f4f0 */
+    --card-foreground: 0 20% 10%;
+
+    --popover: 48 100% 99%;
+    --popover-foreground: 0 20% 10%;
+
+    --primary: 19 100% 50%; /* orange #ff4f00 */
+    --primary-foreground: 48 100% 99%; /* on-primary #fffefb */
+
+    --secondary: 30 36% 96%;
+    --secondary-foreground: 0 20% 10%;
+
+    --muted: 30 36% 96%;
+    --muted-foreground: 47 8% 35%; /* body #605d52 */
+
+    --accent: 30 36% 96%;
+    --accent-foreground: 0 20% 10%;
+
+    --destructive: 0 72% 45%;
+    --destructive-foreground: 48 100% 99%;
+
+    --border: 45 15% 73%; /* mute #c5c0b1 */
+    --input: 45 15% 73%;
+    --ring: 19 100% 50%; /* focus ring = brand orange */
+
+    --radius: 0.75rem; /* 12px */
+
+    /* Score / severity bands (methodology §2) */
+    --band-good: 145 55% 38%;
+    --band-watch: 38 92% 50%;
+    --band-act: 19 100% 50%;
+    --band-urgent: 0 72% 45%;
+  }
+
+  .dark {
+    --background: 0 20% 10%;
+    --foreground: 48 100% 99%;
+    --card: 0 16% 14%;
+    --card-foreground: 48 100% 99%;
+    --popover: 0 20% 10%;
+    --popover-foreground: 48 100% 99%;
+    --primary: 19 100% 50%;
+    --primary-foreground: 48 100% 99%;
+    --secondary: 0 12% 18%;
+    --secondary-foreground: 48 100% 99%;
+    --muted: 0 12% 18%;
+    --muted-foreground: 45 15% 73%;
+    --accent: 0 12% 18%;
+    --accent-foreground: 48 100% 99%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 48 100% 99%;
+    --border: 0 12% 22%;
+    --input: 0 12% 22%;
+    --ring: 19 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}

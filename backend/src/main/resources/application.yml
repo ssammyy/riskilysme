@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: riskily-sme
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/riskily_sme}
+    username: ${SPRING_DATASOURCE_USERNAME:riskily}
+    password: ${SPRING_DATASOURCE_PASSWORD:riskily}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: Africa/Nairobi
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: false
+
+server:
+  port: ${SERVER_PORT:8080}
+
+# Application config (consumed from step 4 onward)
+riskily:
+  auth:
+    jwt-secret: ${JWT_SECRET:change-me-dev-secret-change-me-dev-secret-32b}
+    access-ttl-minutes: ${JWT_ACCESS_TTL_MINUTES:15}
+    refresh-ttl-days: ${JWT_REFRESH_TTL_DAYS:14}
+
+logging:
+  level:
+    org.flywaydb: info
