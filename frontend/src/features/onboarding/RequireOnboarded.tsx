@@ -4,6 +4,6 @@ import { useAuth } from "@/auth/AuthProvider";
 /** Sends authenticated-but-not-yet-onboarded users into the onboarding flow. */
 export function RequireOnboarded() {
   const { user } = useAuth();
-  if (user && !user.onboardingCompleted) return <Navigate to="/onboarding" replace />;
+  if (user && user.role !== "admin" && !user.onboardingCompleted) return <Navigate to="/onboarding" replace />;
   return <Outlet />;
 }

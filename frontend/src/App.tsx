@@ -13,6 +13,7 @@ import { ProtectedRoute } from "@/features/auth/ProtectedRoute";
 import { RequireAdmin } from "@/features/admin/RequireAdmin";
 import { RequireOnboarded } from "@/features/onboarding/RequireOnboarded";
 import AppLayout from "@/layout/AppLayout";
+import AdminLayout from "@/layout/AdminLayout";
 
 export default function App() {
   return (
@@ -23,15 +24,22 @@ export default function App() {
       <Route path="/reset" element={<ResetPasswordPage />} />
       <Route element={<ProtectedRoute />}>
         <Route path="/onboarding" element={<OnboardingPage />} />
+
+        {/* Client routes */}
         <Route element={<RequireOnboarded />}>
           <Route element={<AppLayout />}>
             <Route path="/" element={<DashboardPage />} />
             <Route path="/modules/:code" element={<ModuleDetailPage />} />
             <Route path="/alerts" element={<AlertsPage />} />
             <Route path="/settings" element={<SettingsPage />} />
-            <Route element={<RequireAdmin />}>
-              <Route path="/admin" element={<AdminPage />} />
-            </Route>
+          </Route>
+        </Route>
+
+        {/* Admin routes — own layout, no onboarding gate */}
+        <Route element={<RequireAdmin />}>
+          <Route element={<AdminLayout />}>
+            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/admin/settings" element={<SettingsPage />} />
           </Route>
         </Route>
       </Route>

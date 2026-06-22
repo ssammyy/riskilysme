@@ -59,7 +59,12 @@ class SecurityConfig(private val jwtAuthenticationFilter: JwtAuthenticationFilte
     fun corsConfigurationSource(): CorsConfigurationSource {
         val config = CorsConfiguration().apply {
             // Dev origins; production origins added via config. TODO-confirm.
-            allowedOrigins = listOf("http://localhost:5173")
+            allowedOrigins = listOf(
+                "http://localhost:5173",
+                "https://riskily.africa",
+                "https://www.riskily.africa",
+                "http://178.128.145.102"
+            )
             allowedMethods = listOf("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
             allowedHeaders = listOf("*")
             allowCredentials = true

@@ -1,6 +1,6 @@
 import { useState, type ComponentType } from "react";
-import { Link, Outlet, useLocation } from "react-router-dom";
-import { LayoutDashboard, Bell, Settings, ShieldCheck, Menu, X, LogOut } from "lucide-react";
+import { Link, Navigate, Outlet, useLocation } from "react-router-dom";
+import { LayoutDashboard, Bell, Settings, Menu, X, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +12,6 @@ interface NavEntry {
   to: string;
   label: string;
   icon: ComponentType<{ className?: string }>;
-  adminOnly?: boolean;
 }
 
 /**
@@ -26,12 +25,13 @@ export default function AppLayout() {
   const location = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+  if (user?.role === "admin") return <Navigate to="/admin" replace />;
+
   const navItems: NavEntry[] = [
     { to: "/", label: t.nav.dashboard, icon: LayoutDashboard },
     { to: "/alerts", label: t.nav.alerts, icon: Bell },
     { to: "/settings", label: t.nav.settings, icon: Settings },
-    { to: "/admin", label: t.nav.admin, icon: ShieldCheck, adminOnly: true },
-  ].filter((item) => !item.adminOnly || user?.role === "admin");
+  ];
 
   const isActive = (to: string) =>
     to === "/" ? location.pathname === "/" : location.pathname.startsWith(to);

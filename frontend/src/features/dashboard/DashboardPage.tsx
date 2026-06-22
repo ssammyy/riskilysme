@@ -16,6 +16,8 @@ export default function DashboardPage() {
   const { t, lang } = useLang();
   const { user } = useAuth();
 
+  if (user?.role === "admin") return <Navigate to="/admin" replace />;
+
   const { data: score, isError, error } = useQuery({
     queryKey: ["score", "me"],
     queryFn: () => apiFetch<ScoreResponse>("/score/me"),
