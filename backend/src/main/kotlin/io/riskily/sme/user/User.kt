@@ -39,7 +39,7 @@ class User(
     @Column(nullable = false, length = 20)
     var status: UserStatus = UserStatus.ACTIVE,
 
-    // --- Onboarding profile ---
+    // --- Onboarding profile (retained for legacy data; not used by ExposureCalculator) ---
     @Column(name = "first_name")
     var firstName: String? = null,
 
@@ -61,6 +61,37 @@ class User(
 
     @Column(name = "biggest_cost")
     var biggestCost: String? = null,
+
+    // --- AMD-006 v3.0 onboarding answers (8 Yes/No + conditional Q2b) ---
+    // All nullable: NULL means not yet answered; ExposureCalculator treats null as No (baseline).
+
+    @Column(name = "q1_fx_yes")
+    var q1FxYes: Boolean? = null,
+
+    @Column(name = "q2_loans_yes")
+    var q2LoansYes: Boolean? = null,
+
+    /** Q2b: interest rate band. Only populated when q2LoansYes = true. */
+    @Column(name = "q2b_interest_rate", length = 20)
+    var q2bInterestRate: String? = null,
+
+    @Column(name = "q3_credit_sales_yes")
+    var q3CreditSalesYes: Boolean? = null,
+
+    @Column(name = "q4_fixed_costs_yes")
+    var q4FixedCostsYes: Boolean? = null,
+
+    @Column(name = "q5_concentration_yes")
+    var q5ConcentrationYes: Boolean? = null,
+
+    @Column(name = "q6_cash_timing_yes")
+    var q6CashTimingYes: Boolean? = null,
+
+    @Column(name = "q7_supplier_dep_yes")
+    var q7SupplierDepYes: Boolean? = null,
+
+    @Column(name = "q8_informal_credit_yes")
+    var q8InformalCreditYes: Boolean? = null,
 
     // --- Preferences & subscription ---
     @Enumerated(EnumType.STRING)

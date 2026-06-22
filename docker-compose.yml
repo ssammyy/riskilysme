@@ -1,12 +1,23 @@
+# Complete application on Docker (DB + Backend + Frontend).
+#
+#   Running the full stack on Docker:
+#       docker compose up --build -d
+#
+#   Running only the database locally for host-side development (IDE + Vite):
+#       docker compose up db -d
+#
+# Frontend is served on port 80 and reverse-proxies /api requests to the backend.
+
 services:
   db:
     image: postgres:16-alpine
+    container_name: riskily-sme-db
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-riskily_sme}
       POSTGRES_USER: ${POSTGRES_USER:-riskily}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-riskily}
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "${POSTGRES_PORT:-5433}:5432"
     volumes:
       - sme_pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -16,7 +27,9 @@ services:
       retries: 10
 
   backend:
+    image: samik254/riskily-backend:latest
     build: ./backend
+    container_name: riskily-sme-backend
     depends_on:
       db:
         condition: service_healthy
@@ -27,6 +40,16 @@ services:
       JWT_SECRET: ${JWT_SECRET:-change-me-dev-secret-change-me-dev-secret-32b}
     ports:
       - "${SERVER_PORT:-8080}:8080"
+
+  frontend:
+    image: samik254/riskily-frontend:latest
+    build: ./frontend
+    container_name: riskily-sme-frontend
+    depends_on:
+      backend:
+        condition: service_started
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
 
 volumes:
   sme_pgdata:

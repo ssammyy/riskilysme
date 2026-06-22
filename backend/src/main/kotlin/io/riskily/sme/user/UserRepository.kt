@@ -12,4 +12,12 @@ interface UserRepository : JpaRepository<User, Long> {
 
     @Query("SELECT COUNT(u) > 0 FROM User u WHERE LOWER(u.email) = LOWER(:email)")
     fun existsByEmailIgnoreCase(@Param("email") email: String): Boolean
+
+    fun existsByRole(role: UserRole): Boolean
+
+    fun countBySubscriptionTier(subscriptionTier: SubscriptionTier): Long
+
+    fun findAllByOnboardingCompletedAtIsNotNull(): List<User>
+
+    fun findAllByOrderByCreatedAtDesc(): List<User>
 }

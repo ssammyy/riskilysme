@@ -1,13 +1,14 @@
 package io.riskily.sme
 
 import io.riskily.sme.user.UserRepository
+import io.riskily.sme.user.UserRole
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
 /**
- * Verifies the Spring context loads against a real (Testcontainers) Postgres and that
- * Flyway V1 produced a usable users table.
+ * Verifies the Spring context loads against a real (Testcontainers) Postgres, that Flyway
+ * migrations produced a usable schema, and that the initial admin was seeded.
  */
 class SmeApplicationTests : AbstractIntegrationTest() {
 
@@ -15,7 +16,8 @@ class SmeApplicationTests : AbstractIntegrationTest() {
     lateinit var userRepository: UserRepository
 
     @Test
-    fun `context loads and users table is queryable`() {
-        assertThat(userRepository.count()).isZero()
+    fun `context loads, users table is queryable, and an admin is seeded`() {
+        assertThat(userRepository.count()).isGreaterThanOrEqualTo(0)
+        assertThat(userRepository.existsByRole(UserRole.ADMIN)).isTrue()
     }
 }

@@ -1,91 +1,41 @@
-import { useQuery } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Navigate, Route, Routes } from "react-router-dom";
+import LoginPage from "@/features/auth/LoginPage";
+import RegisterPage from "@/features/auth/RegisterPage";
+import ForgotPasswordPage from "@/features/auth/ForgotPasswordPage";
+import ResetPasswordPage from "@/features/auth/ResetPasswordPage";
+import DashboardPage from "@/features/dashboard/DashboardPage";
+import ModuleDetailPage from "@/features/dashboard/modules/ModuleDetailPage";
+import AlertsPage from "@/features/alerts/AlertsPage";
+import SettingsPage from "@/features/settings/SettingsPage";
+import AdminPage from "@/features/admin/AdminPage";
+import OnboardingPage from "@/features/onboarding/OnboardingPage";
+import { ProtectedRoute } from "@/features/auth/ProtectedRoute";
+import { RequireAdmin } from "@/features/admin/RequireAdmin";
+import { RequireOnboarded } from "@/features/onboarding/RequireOnboarded";
+import AppLayout from "@/layout/AppLayout";
 
-interface HealthResponse {
-  status: string;
-  service: string;
-  time: string;
-}
-
-async function fetchHealth(): Promise<HealthResponse> {
-  const res = await fetch("/api/health");
-  if (!res.ok) throw new Error(`Health check failed: ${res.status}`);
-  return res.json();
-}
-
-/**
- * Sprint 1 design-language proof page. Renders DESIGN.md-themed shadcn primitives and
- * pulls the real backend health endpoint (no hardcoded/fake data). Replaced by the
- * dashboard in Sprint 3.
- */
 export default function App() {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["health"],
-    queryFn: fetchHealth,
-    retry: false,
-  });
-
   return (
-    <main className="min-h-screen bg-background px-4 py-10 sm:px-6 lg:px-8">
-      <div className="mx-auto flex max-w-3xl flex-col gap-8">
-        <header className="flex flex-col gap-2">
-          <span className="text-sm font-medium uppercase tracking-[1px] text-foreground">
-            Riskily SME
-          </span>
-          <h1 className="font-display text-4xl font-medium tracking-tight text-foreground sm:text-5xl">
-            Risk intelligence for your business
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            Foundation scaffold — design language, theming, and the live backend connection.
-          </p>
-        </header>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Backend connection</CardTitle>
-            <CardDescription>Live status from <code>GET /api/health</code></CardDescription>
-          </CardHeader>
-          <CardContent className="flex items-center gap-3">
-            {isLoading && <Badge>Checking…</Badge>}
-            {isError && <Badge variant="urgent">Backend unreachable</Badge>}
-            {data && (
-              <>
-                <Badge variant="good">{data.status}</Badge>
-                <span className="text-sm text-muted-foreground">
-                  {data.service} · {new Date(data.time).toLocaleTimeString()}
-                </span>
-              </>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Score bands</CardTitle>
-            <CardDescription>Business Health Score banding (methodology §2)</CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-wrap gap-2">
-            <Badge variant="good">All Good</Badge>
-            <Badge variant="watch">Watch Out</Badge>
-            <Badge variant="act">Act Now</Badge>
-            <Badge variant="urgent">Urgent</Badge>
-          </CardContent>
-        </Card>
-
-        <div className="flex flex-wrap gap-3">
-          <Button>Get my score</Button>
-          <Button variant="secondary">Sign in</Button>
-          <Button variant="outline">Learn more</Button>
-        </div>
-      </div>
-    </main>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/forgot" element={<ForgotPasswordPage />} />
+      <Route path="/reset" element={<ResetPasswordPage />} />
+      <Route element={<ProtectedRoute />}>
+        <Route path="/onboarding" element={<OnboardingPage />} />
+        <Route element={<RequireOnboarded />}>
+          <Route element={<AppLayout />}>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/modules/:code" element={<ModuleDetailPage />} />
+            <Route path="/alerts" element={<AlertsPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route element={<RequireAdmin />}>
+              <Route path="/admin" element={<AdminPage />} />
+            </Route>
+          </Route>
+        </Route>
+      </Route>
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }

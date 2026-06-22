@@ -20,6 +20,8 @@
     <properties>
         <java.version>17</java.version>
         <kotlin.version>1.9.25</kotlin.version>
+        <!-- Kotlin top-level `fun main` lives in <FileName>Kt -->
+        <start-class>io.riskily.sme.SmeApplicationKt</start-class>
     </properties>
 
     <dependencies>
@@ -63,6 +65,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
         <!-- Required by Argon2PasswordEncoder (used from step 4) -->
         <dependency>
             <groupId>org.bouncycastle</groupId>
@@ -78,6 +84,25 @@
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-reflect</artifactId>
+        </dependency>
+
+        <!-- JWT (auth, step 4) -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.12.6</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.12.6</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.12.6</version>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- Test -->
@@ -122,6 +147,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>io.riskily.sme.SmeApplicationKt</mainClass>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>

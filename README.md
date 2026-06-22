@@ -12,18 +12,33 @@ Canonical product docs (scope, scoring methodology, backlog, ADRs, data model) l
 
 ## Quick start
 
-```bash
-# 1. Bring up Postgres + backend
-docker compose up --build
+The standard dev loop runs Postgres in Docker while you run the backend and frontend on your host:
 
-# 2. Frontend (separate terminal)
+```bash
+# 1. Start Postgres on Docker (localhost:5433)
+docker compose up db -d
+
+# 2. Backend (separate terminal) — connects to the Dockerised DB
+cd backend
+mvn spring-boot:run
+
+# 3. Frontend (separate terminal)
 cd frontend
 npm install
 npm run dev
 ```
 
-Backend defaults to `http://localhost:8080`, frontend to `http://localhost:5173`.
-Health check: `GET http://localhost:8080/api/health`.
+Prefer everything in Docker? Run the **entire stack** (Postgres DB, backend API, and compiled frontend proxy) together:
+
+```bash
+docker compose up --build -d
+```
+
+When running the full Docker stack:
+- Frontend defaults to `http://localhost` (port 80) and proxies API requests.
+- Backend API defaults to `http://localhost:8080`.
+- Health check: `GET http://localhost:8080/api/health`.
+Requires Docker, JDK 17+, Maven, and Node 20+.
 
 ## Repository layout
 

@@ -10,6 +10,12 @@ node_modules/
 frontend/dist/
 *.local
 
+# TS / Vite build artifacts
+*.tsbuildinfo
+frontend/vite.config.js
+frontend/vite.config.d.ts
+frontend/vite.config.ts.timestamp-*.mjs
+
 # Env / secrets
 .env
 .env.*
