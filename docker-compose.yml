@@ -32,6 +32,7 @@ services:
     platform: linux/amd64
     build: ./backend
     container_name: riskily-sme-backend
+    entrypoint: ["java", "-Xms128m", "-Xmx192m", "-XX:MaxMetaspaceSize=96m", "-jar", "app.jar"]
     depends_on:
       db:
         condition: service_healthy
