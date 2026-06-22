@@ -11,6 +11,7 @@
 services:
   db:
     image: postgres:16-alpine
+    platform: linux/amd64
     container_name: riskily-sme-db
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-riskily_sme}
@@ -28,6 +29,7 @@ services:
 
   backend:
     image: samik254/riskily-backend:latest
+    platform: linux/amd64
     build: ./backend
     container_name: riskily-sme-backend
     depends_on:
@@ -43,6 +45,7 @@ services:
 
   frontend:
     image: samik254/riskily-frontend:latest
+    platform: linux/amd64
     build: ./frontend
     container_name: riskily-sme-frontend
     depends_on:
