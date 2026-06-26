@@ -41,6 +41,8 @@ services:
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-riskily}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-riskily}
       JWT_SECRET: ${JWT_SECRET:-change-me-dev-secret-change-me-dev-secret-32b}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      CLAUDE_API_KEY: ${CLAUDE_API_KEY:-}
     ports:
       - "${SERVER_PORT:-8080}:8080"
 

@@ -21,7 +21,7 @@ spring:
     host: ${MAIL_HOST:smtp.resend.com}
     port: ${MAIL_PORT:465}
     username: ${MAIL_USERNAME:resend}
-    password: ${MAIL_PASSWORD:${RESEND_API_KEY:your-resend-api-key-here}}
+    password: ${MAIL_PASSWORD:${RESEND_API_KEY:}}
     from: ${MAIL_FROM:hello@riskily.africa}
     properties:
       mail:
@@ -45,7 +45,7 @@ riskily:
     email: ${ADMIN_EMAIL:admin@riskily.africa}
     password: ${ADMIN_PASSWORD:changeme-admin-pass}
   ai:
-    claude-api-key: ${CLAUDE_API_KEY:your-anthropic-api-key-here}
+    claude-api-key: ${CLAUDE_API_KEY:}
     model: ${CLAUDE_MODEL:claude-haiku-4-5-20251001}
     enabled: ${AI_INSIGHTS_ENABLED:true}
 
