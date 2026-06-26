@@ -4,7 +4,8 @@ target/
 *.jar
 !.mvn/wrapper/maven-wrapper.jar
 .mvn/
-
+.env.example
+.env
 # Node / Vite
 node_modules/
 frontend/dist/
