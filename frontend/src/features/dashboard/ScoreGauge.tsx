@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLang } from "@/lang/LanguageProvider";
+import { UpgradePrompt } from "@/components/UpgradePrompt";
 import type { BandCode } from "@/score/types";
 
 interface ScoreGaugeProps {
@@ -140,16 +140,8 @@ export function ScoreGauge({ score, band, calculatedAt, subscriptionTier }: Scor
           </Badge>
           <p className="max-w-xs text-sm text-muted-foreground">{bandDescription}</p>
           <p className="text-xs text-muted-foreground">{updatedLabel}</p>
-          {/* Basic-tier nudge: upgrade for daily score updates */}
           {subscriptionTier === "basic" && (
-            <Button
-              size="sm"
-              variant="outline"
-              className="self-center sm:self-start text-xs mt-1"
-              // TODO: wire to upgrade/payment flow
-            >
-              {t.upgrade.cta}
-            </Button>
+            <UpgradePrompt variant="inline" />
           )}
         </div>
       </CardContent>

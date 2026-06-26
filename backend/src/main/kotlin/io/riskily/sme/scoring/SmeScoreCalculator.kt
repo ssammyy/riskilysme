@@ -41,15 +41,19 @@ class SmeScoreCalculator(
         val modules = ModuleCode.entries.map { code ->
             val exposure = exposures.getValue(code)
             val pressure = pressures.getValue(code)
-            val health = (100.0 - exposure * pressure).coerceIn(0.0, 100.0).roundToInt()
+            val rawHealth = (100.0 - exposure * pressure).coerceIn(0.0, 100.0).roundToInt()
+            val isProvisional = code == ModuleCode.REGULATORY && circulars > 0
+            // §6.4 provisional floor: cap health when active circulars are present,
+            // because REGULATORY exposure (~5%) makes a pressure floor ineffective.
+            val health = if (isProvisional) minOf(rawHealth, provisionalHealthCap(circulars)) else rawHealth
             ModuleScoreResult(
                 code = code,
                 exposure = exposure,
                 pressure = pressure,
                 health = health,
                 band = band(health),
-                dataConfidence = DataConfidence.PROFILE, // Phase 1: profile-driven
-                isProvisional = code == ModuleCode.REGULATORY && circulars > 0,
+                dataConfidence = DataConfidence.PROFILE,
+                isProvisional = isProvisional,
             )
         }
 
@@ -69,6 +73,15 @@ class SmeScoreCalculator(
             (equalBase + tilt) * m.health
         }
         return score.roundToInt()
+    }
+
+    private fun provisionalHealthCap(circulars: Int): Int {
+        val caps = config.node("pressure.compliance").get("provisionalHealthCap")
+        return when {
+            circulars >= 3 -> caps.get("threePlus").asInt()
+            circulars == 2 -> caps.get("two").asInt()
+            else           -> caps.get("one").asInt()
+        }
     }
 
     fun band(health: Int): Band {

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/auth/AuthProvider";
+import { useLang } from "@/lang/LanguageProvider";
 
 interface NavEntry {
   to: string;
@@ -15,6 +16,7 @@ interface NavEntry {
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
+  const { t } = useLang();
   const location = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -39,8 +41,8 @@ export default function AdminLayout() {
             <ShieldCheck className="h-5 w-5 text-white" />
           </div>
           <div className="min-w-0">
-            <h2 className="text-sm font-bold text-[#201515] leading-tight">Admin Console</h2>
-            <p className="text-[10px] text-muted-foreground mt-0.5">Riskily SME</p>
+            <h2 className="text-sm font-bold text-[#201515] leading-tight">{t.admin.adminConsole}</h2>
+            <p className="text-[10px] text-muted-foreground mt-0.5">{t.common.appName}</p>
           </div>
         </div>
       </div>
@@ -144,7 +146,7 @@ export default function AdminLayout() {
           </Button>
 
           <div className="flex items-center gap-2 text-sm select-none">
-            <span className="text-muted-foreground font-medium">Admin Console</span>
+            <span className="text-muted-foreground font-medium">{t.admin.adminConsole}</span>
             <span className="text-muted-foreground/40 font-semibold">/</span>
             <span className="font-display font-medium text-[#201515]">{activeLabel}</span>
           </div>

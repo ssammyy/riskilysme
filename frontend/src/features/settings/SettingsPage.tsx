@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PasswordInput } from "@/components/PasswordInput";
 import { useAuth } from "@/auth/AuthProvider";
 import { useLang } from "@/lang/LanguageProvider";
 import { apiFetch } from "@/lib/api";
@@ -105,9 +106,8 @@ export default function SettingsPage() {
             <form className="flex flex-col gap-4" onSubmit={changePassword}>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="currentPassword">{t.settings.currentPasswordLabel}</Label>
-                <Input
+                <PasswordInput
                   id="currentPassword"
-                  type="password"
                   autoComplete="current-password"
                   required
                   value={currentPassword}
@@ -116,9 +116,8 @@ export default function SettingsPage() {
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="newPassword">{t.settings.newPasswordLabel}</Label>
-                <Input
+                <PasswordInput
                   id="newPassword"
-                  type="password"
                   autoComplete="new-password"
                   required
                   minLength={8}

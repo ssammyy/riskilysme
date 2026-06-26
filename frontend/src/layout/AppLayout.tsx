@@ -1,6 +1,9 @@
 import { useState, type ComponentType } from "react";
 import { Link, Navigate, Outlet, useLocation } from "react-router-dom";
-import { LayoutDashboard, Bell, Settings, Menu, X, LogOut } from "lucide-react";
+import {
+  LayoutDashboard, Bell, Settings, Menu, X, LogOut, Calendar, Sparkles,
+  ArrowLeftRight, Droplets, Users, Package, CreditCard, Scale, Globe,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -12,12 +15,22 @@ interface NavEntry {
   to: string;
   label: string;
   icon: ComponentType<{ className?: string }>;
+  exact?: boolean;
 }
 
+const MODULE_NAV: NavEntry[] = [
+  { to: "/modules/fx",           label: "Foreign Exchange",    icon: ArrowLeftRight },
+  { to: "/modules/liquidity",    label: "Cash Flow",           icon: Droplets },
+  { to: "/modules/counterparty", label: "Customers & Suppliers", icon: Users },
+  { to: "/modules/commodity",    label: "Commodity Prices",    icon: Package },
+  { to: "/modules/credit",       label: "Credit & Loans",      icon: CreditCard },
+  { to: "/modules/regulatory",   label: "Compliance",          icon: Scale },
+  { to: "/modules/macro",        label: "Economic Conditions", icon: Globe },
+];
+
 /**
- * The single page-level layout wrapper (the one bespoke component DESIGN.md rules allow).
- * Persistent left sidebar on lg+, off-canvas drawer on mobile, and a top bar with the page
- * title, language toggle and the signed-in user. Renders the active route via <Outlet/>.
+ * The single page-level layout wrapper.
+ * Persistent left sidebar on lg+, off-canvas drawer on mobile.
  */
 export default function AppLayout() {
   const { t, lang, setLang } = useLang();
@@ -27,21 +40,51 @@ export default function AppLayout() {
 
   if (user?.role === "admin") return <Navigate to="/admin" replace />;
 
-  const navItems: NavEntry[] = [
-    { to: "/", label: t.nav.dashboard, icon: LayoutDashboard },
-    { to: "/alerts", label: t.nav.alerts, icon: Bell },
-    { to: "/settings", label: t.nav.settings, icon: Settings },
+  const primaryNav: NavEntry[] = [
+    { to: "/",          label: t.nav.dashboard, icon: LayoutDashboard, exact: true },
+    { to: "/deadlines", label: t.nav.deadlines, icon: Calendar },
+    { to: "/insights",  label: t.nav.insights,  icon: Sparkles },
+    { to: "/alerts",    label: t.nav.alerts,    icon: Bell },
+    { to: "/settings",  label: t.nav.settings,  icon: Settings },
   ];
 
-  const isActive = (to: string) =>
-    to === "/" ? location.pathname === "/" : location.pathname.startsWith(to);
+  const isActive = ({ to, exact }: NavEntry) =>
+    exact ? location.pathname === to : location.pathname.startsWith(to);
 
-  const pageTitle =
-    navItems.find((i) => isActive(i.to))?.label ?? t.common.appName;
+  const activeEntry =
+    MODULE_NAV.find((m) => location.pathname.startsWith(m.to)) ??
+    primaryNav.find(isActive);
+  const pageTitle = activeEntry?.label ?? t.common.appName;
+
+  const NavLink = ({ item, onClick }: { item: NavEntry; onClick?: () => void }) => {
+    const active = isActive(item);
+    const Icon = item.icon;
+    return (
+      <Link
+        to={item.to}
+        onClick={onClick}
+        className={cn(
+          "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all relative group",
+          active
+            ? "bg-primary/5 text-primary font-semibold"
+            : "text-muted-foreground hover:bg-card hover:text-[#201515]",
+        )}
+      >
+        {active && (
+          <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r bg-primary" />
+        )}
+        <Icon className={cn(
+          "h-4 w-4 shrink-0 transition-colors",
+          active ? "text-primary" : "text-muted-foreground group-hover:text-foreground",
+        )} />
+        <span className="truncate">{item.label}</span>
+      </Link>
+    );
+  };
 
   const SidebarContent = (
     <div className="flex h-full flex-col">
-      {/* Workspace picker styling */}
+      {/* Workspace card */}
       <div className="p-4">
         <div className="flex items-center gap-3 rounded-xl border border-border/40 bg-card p-3 shadow-sm select-none">
           <div className="h-9 w-9 rounded-lg bg-primary flex items-center justify-center text-white font-black text-xl shrink-0">
@@ -52,12 +95,15 @@ export default function AppLayout() {
               {user?.firstName ? `${user.firstName}'s Co.` : t.common.appName}
             </h2>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <Badge variant="outline" className={[
-                "text-[9px] font-bold uppercase tracking-wider px-1.5 py-0 rounded",
-                user?.subscriptionTier === "standard" 
-                  ? "bg-primary/5 text-primary border-primary/20" 
-                  : "bg-muted text-muted-foreground border-border/50"
-              ].join(" ")}>
+              <Badge
+                variant="outline"
+                className={cn(
+                  "text-[9px] font-bold uppercase tracking-wider px-1.5 py-0 rounded",
+                  user?.subscriptionTier === "standard"
+                    ? "bg-primary/5 text-primary border-primary/20"
+                    : "bg-muted text-muted-foreground border-border/50",
+                )}
+              >
                 {user?.subscriptionTier === "standard" ? t.admin.tierStandard : t.admin.tierBasic}
               </Badge>
             </div>
@@ -65,56 +111,44 @@ export default function AppLayout() {
         </div>
       </div>
 
-      <Separator className="bg-border/30 px-4" />
+      <Separator className="bg-border/30" />
 
-      {/* Styled Nav links */}
-      <nav className="flex flex-1 flex-col gap-1 px-3 py-4 overflow-y-auto">
-        {navItems.map(({ to, label, icon: Icon }) => {
-          const active = isActive(to);
-          return (
-            <Link
-              key={to}
-              to={to}
-              onClick={() => setDrawerOpen(false)}
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all relative group",
-                active
-                  ? "bg-primary/5 text-primary font-semibold"
-                  : "text-muted-foreground hover:bg-card hover:text-[#201515]"
-              )}
-            >
-              {active && (
-                <span className="absolute left-0 top-2.5 bottom-2.5 w-1 rounded-r bg-primary" />
-              )}
-              <Icon className={cn("h-4.5 w-4.5 shrink-0 transition-colors", active ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
-              {label}
-            </Link>
-          );
-        })}
+      <nav className="flex flex-1 flex-col gap-0.5 px-3 py-3 overflow-y-auto">
+        {/* Primary nav */}
+        {primaryNav.map((item) => (
+          <NavLink key={item.to} item={item} onClick={() => setDrawerOpen(false)} />
+        ))}
+
+        {/* Risk Modules section */}
+        <div className="mt-4 mb-1 px-3">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+            {t.nav.riskModules}
+          </p>
+        </div>
+        {MODULE_NAV.map((item) => (
+          <NavLink key={item.to} item={item} onClick={() => setDrawerOpen(false)} />
+        ))}
       </nav>
 
-      {/* User profile footer section */}
+      {/* User footer */}
       <div className="mt-auto border-t border-border/30 p-4 bg-card/45 select-none">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="h-9 w-9 rounded-full bg-primary/10 border border-primary/20 text-primary flex items-center justify-center font-bold text-xs shrink-0 select-none">
+            <div className="h-9 w-9 rounded-full bg-primary/10 border border-primary/20 text-primary flex items-center justify-center font-bold text-xs shrink-0">
               {(user?.firstName || "U").charAt(0).toUpperCase()}
             </div>
             <div className="min-w-0">
               <p className="text-xs font-bold text-[#201515] truncate leading-tight">
                 {user?.firstName || "User"}
               </p>
-              <p className="text-[10px] text-muted-foreground truncate mt-0.5">
-                {user?.email}
-              </p>
+              <p className="text-[10px] text-muted-foreground truncate mt-0.5">{user?.email}</p>
             </div>
           </div>
-          
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => logout()}
-            className="h-8 w-8 rounded-lg hover:bg-destructive/10 hover:text-destructive shrink-0 text-muted-foreground transition-colors"
+            className="h-8 w-8 rounded-lg hover:bg-destructive/10 hover:text-destructive shrink-0 text-muted-foreground"
             title={t.dashboard.signOut}
           >
             <LogOut className="h-4 w-4" />
@@ -127,7 +161,7 @@ export default function AppLayout() {
   return (
     <div className="flex min-h-screen bg-background">
       {/* Desktop sidebar */}
-      <aside className="hidden w-64 shrink-0 border-r border-border bg-card/45 lg:block sticky top-0 h-screen max-h-screen flex flex-col">
+      <aside className="hidden w-64 shrink-0 border-r border-border bg-card/45 lg:flex lg:flex-col sticky top-0 h-screen max-h-screen">
         {SidebarContent}
       </aside>
 
@@ -145,9 +179,7 @@ export default function AppLayout() {
                 <X className="h-5 w-5" />
               </Button>
             </div>
-            <div className="flex-1 overflow-y-auto">
-              {SidebarContent}
-            </div>
+            <div className="flex-1 overflow-y-auto">{SidebarContent}</div>
           </aside>
         </div>
       )}
@@ -162,10 +194,9 @@ export default function AppLayout() {
             onClick={() => setDrawerOpen(true)}
             aria-label={t.nav.menu}
           >
-            <Menu className="h-4.5 w-4.5 text-foreground" />
+            <Menu className="h-4 w-4 text-foreground" />
           </Button>
 
-          {/* Elegant Breadcrumbs */}
           <div className="flex items-center gap-2 text-sm select-none">
             <span className="text-muted-foreground font-medium">Riskily</span>
             <span className="text-muted-foreground/40 font-semibold">/</span>
@@ -173,15 +204,12 @@ export default function AppLayout() {
           </div>
 
           <div className="ml-auto flex items-center gap-2">
-            {/* Tabbed Language switcher */}
             <div className="flex items-center rounded-lg border border-border/40 p-0.5 bg-card/60">
               <button
                 onClick={() => setLang("en")}
                 className={cn(
                   "rounded-md px-2.5 py-1 text-[10px] font-bold transition-all",
-                  lang === "en"
-                    ? "bg-white text-primary shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
+                  lang === "en" ? "bg-white text-primary shadow-sm" : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 EN
@@ -190,9 +218,7 @@ export default function AppLayout() {
                 onClick={() => setLang("sw")}
                 className={cn(
                   "rounded-md px-2.5 py-1 text-[10px] font-bold transition-all",
-                  lang === "sw"
-                    ? "bg-white text-primary shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
+                  lang === "sw" ? "bg-white text-primary shadow-sm" : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 SW
@@ -202,7 +228,10 @@ export default function AppLayout() {
             {user && (
               <>
                 <Separator orientation="vertical" className="mx-1 h-5 bg-border/40" />
-                <Badge variant="outline" className="hidden border-border/40 bg-card/60 text-muted-foreground text-[10px] font-bold uppercase tracking-wider rounded-md px-2 py-0.5 sm:inline">
+                <Badge
+                  variant="outline"
+                  className="hidden border-border/40 bg-card/60 text-muted-foreground text-[10px] font-bold uppercase tracking-wider rounded-md px-2 py-0.5 sm:inline"
+                >
                   {user.subscriptionTier === "standard" ? t.admin.tierStandard : t.admin.tierBasic}
                 </Badge>
               </>

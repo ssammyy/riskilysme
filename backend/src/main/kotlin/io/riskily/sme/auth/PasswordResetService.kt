@@ -49,6 +49,7 @@ class PasswordResetService(
         val user = users.findById(token.userId)
             .orElseThrow { InvalidTokenException("User no longer exists") }
         user.passwordHash = passwordEncoder.encode(newPassword)
+        user.emailVerified = true  // clicking a reset link proves email ownership
         users.save(user)
         token.usedAt = Instant.now()
         tokens.save(token)

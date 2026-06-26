@@ -1,9 +1,9 @@
 import { useState, type FormEvent } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { PasswordInput } from "@/components/PasswordInput";
 import { apiFetch } from "@/lib/api";
 import { useLang } from "@/lang/LanguageProvider";
 
@@ -48,9 +48,8 @@ export default function ResetPasswordPage() {
             <form className="flex flex-col gap-4" onSubmit={onSubmit}>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="password">{t.auth.reset.passwordLabel}</Label>
-                <Input
+                <PasswordInput
                   id="password"
-                  type="password"
                   autoComplete="new-password"
                   required
                   minLength={8}

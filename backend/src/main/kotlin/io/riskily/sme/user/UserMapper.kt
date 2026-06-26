@@ -9,6 +9,7 @@ data class UserSummaryResponse(
     val subscriptionTier: String,
     val language: String,
     val onboardingCompleted: Boolean,
+    val emailVerified: Boolean,
 )
 
 fun User.toSummary(): UserSummaryResponse = UserSummaryResponse(
@@ -19,4 +20,5 @@ fun User.toSummary(): UserSummaryResponse = UserSummaryResponse(
     subscriptionTier = subscriptionTier.name.lowercase(),
     language = language.code,
     onboardingCompleted = onboardingCompletedAt != null,
+    emailVerified = emailVerified,
 )

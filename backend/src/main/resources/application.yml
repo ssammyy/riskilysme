@@ -17,21 +17,37 @@ spring:
     enabled: true
     locations: classpath:db/migration
     baseline-on-migrate: false
+  mail:
+    host: ${MAIL_HOST:smtp.resend.com}
+    port: ${MAIL_PORT:465}
+    username: ${MAIL_USERNAME:resend}
+    password: ${MAIL_PASSWORD:${RESEND_API_KEY:your-resend-api-key-here}}
+    from: ${MAIL_FROM:hello@riskily.africa}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
 
 server:
   port: ${SERVER_PORT:8080}
   forward-headers-strategy: framework
 
-# Application config (consumed from step 4 onward)
 riskily:
+  app:
+    base-url: ${APP_BASE_URL:http://localhost:5173}
   auth:
     jwt-secret: ${JWT_SECRET:change-me-dev-secret-change-me-dev-secret-32b}
     access-ttl-minutes: ${JWT_ACCESS_TTL_MINUTES:15}
     refresh-ttl-days: ${JWT_REFRESH_TTL_DAYS:14}
   admin:
-    # Initial admin is created on startup if no admin exists. Override in real environments.
     email: ${ADMIN_EMAIL:admin@riskily.africa}
     password: ${ADMIN_PASSWORD:changeme-admin-pass}
+  ai:
+    claude-api-key: ${CLAUDE_API_KEY:your-anthropic-api-key-here}
+    model: ${CLAUDE_MODEL:claude-haiku-4-5-20251001}
+    enabled: ${AI_INSIGHTS_ENABLED:true}
 
 logging:
   level:

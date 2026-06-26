@@ -18,7 +18,8 @@ enum class Feature(val key: String, val defaultMinTier: SubscriptionTier) {
     CUSTOMER_TRACKER("customer_tracker", SubscriptionTier.STANDARD),
     LOAN_MONITOR("loan_monitor", SubscriptionTier.STANDARD),
     WHATSAPP_ALERTS("whatsapp_alerts", SubscriptionTier.STANDARD),
-    ACADEMY("academy", SubscriptionTier.STANDARD);
+    ACADEMY("academy", SubscriptionTier.STANDARD),
+    AI_INSIGHTS("ai_insights", SubscriptionTier.STANDARD);
 
     companion object {
         fun fromKey(key: String): Feature =

@@ -12,3 +12,11 @@ data class ResetPasswordRequest(
     @field:NotBlank val token: String,
     @field:NotBlank @field:Size(min = 8, max = 100) val newPassword: String,
 )
+
+data class VerifyEmailRequest(
+    @field:NotBlank val token: String,
+)
+
+data class ResendVerificationRequest(
+    @field:Email @field:NotBlank val email: String,
+)

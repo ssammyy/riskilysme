@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -173,8 +173,8 @@ export default function AdminPage() {
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="entitlements">Entitlements</TabsTrigger>
-            <TabsTrigger value="rates">CBK Rates</TabsTrigger>
-            <TabsTrigger value="audit">Audit Log</TabsTrigger>
+            <TabsTrigger value="rates">{t.admin.tabRates}</TabsTrigger>
+            <TabsTrigger value="audit">{t.admin.tabAudit}</TabsTrigger>
           </TabsList>
 
           {/* ── Overview ── */}
@@ -225,6 +225,8 @@ export default function AdminPage() {
             </Card>
 
             {activePreview === "basic" && <UpgradePrompt variant="inline" />}
+
+            <JobsCard t={t} />
           </TabsContent>
 
           {/* ── Users ── */}
@@ -424,6 +426,93 @@ export default function AdminPage() {
         </Tabs>
       </div>
     </main>
+  );
+}
+
+function JobsCard({ t }: { t: ReturnType<typeof useLang>["t"] }) {
+  const [lastScore, setLastScore] = useState<string | null>(null);
+  const [lastMarket, setLastMarket] = useState<string | null>(null);
+
+  const triggerScore = useMutation({
+    mutationFn: () =>
+      apiFetch<{ triggered: boolean; startedAt: string }>("/admin/daily-score", {
+        method: "POST",
+        body: JSON.stringify({}),
+      }),
+    onSuccess: (data) => setLastScore(data.startedAt),
+  });
+
+  const triggerMarket = useMutation({
+    mutationFn: () =>
+      apiFetch<{ triggered: boolean; startedAt: string }>("/admin/market-refresh", {
+        method: "POST",
+        body: JSON.stringify({}),
+      }),
+    onSuccess: (data) => setLastMarket(data.startedAt),
+  });
+
+  useEffect(() => {
+    if (!lastScore) return;
+    const t = setTimeout(() => setLastScore(null), 8000);
+    return () => clearTimeout(t);
+  }, [lastScore]);
+
+  useEffect(() => {
+    if (!lastMarket) return;
+    const t = setTimeout(() => setLastMarket(null), 8000);
+    return () => clearTimeout(t);
+  }, [lastMarket]);
+
+  const jobs = [
+    {
+      title: t.admin.jobDailyScore,
+      desc: t.admin.jobDailyScoreDesc,
+      lastRun: lastScore,
+      isPending: triggerScore.isPending,
+      onRun: () => triggerScore.mutate(),
+    },
+    {
+      title: t.admin.jobMarketRefresh,
+      desc: t.admin.jobMarketRefreshDesc,
+      lastRun: lastMarket,
+      isPending: triggerMarket.isPending,
+      onRun: () => triggerMarket.mutate(),
+    },
+  ];
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{t.admin.jobsTitle}</CardTitle>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-3">
+        {jobs.map((job) => (
+          <div
+            key={job.title}
+            className="flex items-center justify-between gap-4 rounded-lg border border-border/30 bg-background p-4"
+          >
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-[#201515]">{job.title}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{job.desc}</p>
+              {job.lastRun && (
+                <p className="text-xs text-green-600 mt-1">
+                  {t.admin.jobTriggered} — {new Date(job.lastRun).toLocaleTimeString()}
+                </p>
+              )}
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              className="shrink-0"
+              disabled={job.isPending}
+              onClick={job.onRun}
+            >
+              {job.isPending ? t.admin.jobRunning : t.admin.jobRunNow}
+            </Button>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
   );
 }
 

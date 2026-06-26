@@ -1,9 +1,9 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/auth/AuthProvider";
 
-/** Gates child routes behind authentication. Tier-specific gating is added in step 6. */
+/** Gates child routes behind authentication and email verification. */
 export function ProtectedRoute() {
-  const { status } = useAuth();
+  const { status, user } = useAuth();
 
   if (status === "loading") {
     return (
@@ -14,6 +14,12 @@ export function ProtectedRoute() {
   }
 
   if (status === "anonymous") return <Navigate to="/login" replace />;
+
+  // Regular users must verify their email before accessing the app.
+  // Admins are seeded with emailVerified = true and bypass this gate.
+  if (user && !user.emailVerified && user.role !== "admin") {
+    return <Navigate to="/verify-email" replace />;
+  }
 
   return <Outlet />;
 }

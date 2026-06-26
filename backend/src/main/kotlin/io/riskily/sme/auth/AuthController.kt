@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController
 class AuthController(
     private val authService: AuthService,
     private val passwordResetService: PasswordResetService,
+    private val emailVerificationService: EmailVerificationService,
 ) {
 
     @PostMapping("/register")
@@ -45,6 +46,20 @@ class AuthController(
     @PostMapping("/password/reset")
     fun resetPassword(@Valid @RequestBody request: ResetPasswordRequest): ResponseEntity<Void> {
         passwordResetService.resetPassword(request.token, request.newPassword)
+        return ResponseEntity.noContent().build()
+    }
+
+    /** Consume the verification token from the email link. Always 204 on success. */
+    @PostMapping("/email/verify")
+    fun verifyEmail(@Valid @RequestBody request: VerifyEmailRequest): ResponseEntity<Void> {
+        emailVerificationService.verifyEmail(request.token)
+        return ResponseEntity.noContent().build()
+    }
+
+    /** Resend a verification email. Always 204 (no account enumeration). */
+    @PostMapping("/email/resend")
+    fun resendVerification(@Valid @RequestBody request: ResendVerificationRequest): ResponseEntity<Void> {
+        emailVerificationService.resendVerification(request.email)
         return ResponseEntity.noContent().build()
     }
 }

@@ -7,14 +7,15 @@ import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/auth/AuthProvider";
 import { useLang } from "@/lang/LanguageProvider";
 import { apiFetch } from "@/lib/api";
+import { UpgradePrompt } from "@/components/UpgradePrompt";
 import type { AlertsPageData, AlertItem, AlertSeverity } from "./types";
 
 const UNLIMITED_CAP = 2147483647;
 
-const SEVERITY_STYLES: Record<AlertSeverity, { badge: string; border: string }> = {
-  URGENT:    { badge: "bg-destructive text-destructive-foreground", border: "border-l-destructive" },
-  ACT_NOW:   { badge: "bg-orange-500 text-white", border: "border-l-orange-500" },
-  WATCH_OUT: { badge: "bg-yellow-500 text-white", border: "border-l-yellow-500" },
+const SEVERITY_STYLES: Record<AlertSeverity, { badgeVariant: "urgent" | "act" | "watch"; border: string }> = {
+  URGENT:    { badgeVariant: "urgent", border: "border-l-destructive" },
+  ACT_NOW:   { badgeVariant: "act",    border: "border-l-orange-500" },
+  WATCH_OUT: { badgeVariant: "watch",  border: "border-l-yellow-500" },
 };
 
 export default function AlertsPage() {
@@ -89,20 +90,15 @@ export default function AlertsPage() {
                 }
               />
             ))}
+            {/* 4th-alert intercept: when cap is hit, the next slot shows an upgrade prompt */}
+            {isBasic && monthlyCap !== null && monthlyUsed >= monthlyCap && (
+              <UpgradePrompt variant="card" />
+            )}
           </div>
         )}
 
-        {/* Upgrade nudge for Basic users after list */}
-        {isBasic && (
-          <Card className="border-primary/20 bg-primary/5">
-            <CardContent className="pt-5 pb-4">
-              <p className="text-sm font-semibold mb-1">{t.upgrade.title}</p>
-              <p className="text-sm text-muted-foreground mb-3">{t.upgrade.body}</p>
-              {/* TODO: wire to real upgrade/payment flow */}
-              <Button size="sm" variant="default">{t.upgrade.cta}</Button>
-            </CardContent>
-          </Card>
-        )}
+        {/* Persistent upgrade nudge for all Basic users */}
+        {isBasic && <UpgradePrompt variant="card" />}
       </div>
     </main>
   );
@@ -131,7 +127,7 @@ function AlertCard({ alert, onMarkRead, markReadLabel, severityLabel }: AlertCar
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <Badge className={`text-xs shrink-0 ${styles.badge}`}>
+              <Badge variant={styles.badgeVariant} className="text-xs shrink-0">
                 {severityLabel}
               </Badge>
               <span className="text-xs text-muted-foreground">{dateStr}</span>

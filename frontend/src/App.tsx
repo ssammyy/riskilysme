@@ -3,9 +3,12 @@ import LoginPage from "@/features/auth/LoginPage";
 import RegisterPage from "@/features/auth/RegisterPage";
 import ForgotPasswordPage from "@/features/auth/ForgotPasswordPage";
 import ResetPasswordPage from "@/features/auth/ResetPasswordPage";
+import VerifyEmailPage from "@/features/auth/VerifyEmailPage";
 import DashboardPage from "@/features/dashboard/DashboardPage";
 import ModuleDetailPage from "@/features/dashboard/modules/ModuleDetailPage";
 import AlertsPage from "@/features/alerts/AlertsPage";
+import DeadlinesPage from "@/features/dashboard/DeadlinesPage";
+import InsightsPage from "@/features/dashboard/InsightsPage";
 import SettingsPage from "@/features/settings/SettingsPage";
 import AdminPage from "@/features/admin/AdminPage";
 import OnboardingPage from "@/features/onboarding/OnboardingPage";
@@ -22,6 +25,7 @@ export default function App() {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/forgot" element={<ForgotPasswordPage />} />
       <Route path="/reset" element={<ResetPasswordPage />} />
+      <Route path="/verify-email" element={<VerifyEmailPage />} />
       <Route element={<ProtectedRoute />}>
         <Route path="/onboarding" element={<OnboardingPage />} />
 
@@ -30,6 +34,8 @@ export default function App() {
           <Route element={<AppLayout />}>
             <Route path="/" element={<DashboardPage />} />
             <Route path="/modules/:code" element={<ModuleDetailPage />} />
+            <Route path="/deadlines" element={<DeadlinesPage />} />
+            <Route path="/insights" element={<InsightsPage />} />
             <Route path="/alerts" element={<AlertsPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Route>

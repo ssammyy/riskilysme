@@ -3,7 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { PasswordInput } from "@/components/PasswordInput";
 import { useAuth } from "@/auth/AuthProvider";
 import { useLang } from "@/lang/LanguageProvider";
 
@@ -13,6 +15,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [remember, setRemember] = useState(false);
   const [error, setError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -21,7 +24,7 @@ export default function LoginPage() {
     setError(false);
     setSubmitting(true);
     try {
-      await login({ email, password });
+      await login({ email, password }, remember);
       navigate("/", { replace: true });
     } catch {
       setError(true);
@@ -52,14 +55,23 @@ export default function LoginPage() {
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="password">{t.auth.passwordLabel}</Label>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 autoComplete="current-password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+            </div>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="remember"
+                checked={remember}
+                onCheckedChange={(v) => setRemember(v === true)}
+              />
+              <Label htmlFor="remember" className="cursor-pointer font-normal text-sm">
+                {t.auth.login.rememberMe}
+              </Label>
             </div>
             {error && <p className="text-sm text-destructive">{t.auth.login.error}</p>}
             <Button type="submit" disabled={submitting}>

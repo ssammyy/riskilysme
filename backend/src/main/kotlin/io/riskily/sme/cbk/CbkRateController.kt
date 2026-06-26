@@ -82,10 +82,20 @@ class CbkRateController(
             oldValue            = oldValue,
             newValue            = body.rateValue.toPlainString(),
             deltaPct            = deltaPct,
+            affectedModules     = affectedModulesFor(safeType),
             performedByOverride = principal.username,
         )
 
         return saved.toResponse()
+    }
+
+    private fun affectedModulesFor(rateType: String): List<String> = when (rateType) {
+        "CBR"       -> listOf("CREDIT", "LIQUIDITY", "MACRO")
+        "USD_KES"   -> listOf("FX", "COMMODITY", "MACRO")
+        "FUEL_KES"  -> listOf("COMMODITY")
+        "UNGA_KES"  -> listOf("COMMODITY")
+        "T_BILL_91" -> listOf("CREDIT", "MACRO")
+        else        -> emptyList()
     }
 
     private fun CbkRate.toResponse() = CbkRateResponse(

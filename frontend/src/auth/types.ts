@@ -6,6 +6,7 @@ export interface UserSummary {
   subscriptionTier: "basic" | "standard";
   language: "en" | "sw";
   onboardingCompleted: boolean;
+  emailVerified: boolean;
 }
 
 export interface AuthResponse {

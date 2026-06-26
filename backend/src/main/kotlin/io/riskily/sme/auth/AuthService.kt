@@ -18,6 +18,7 @@ class AuthService(
     private val passwordEncoder: PasswordEncoder,
     private val jwtService: JwtService,
     private val authenticationManager: AuthenticationManager,
+    private val emailVerificationService: EmailVerificationService,
 ) {
 
     /** Register a new SME user (defaults to USER role + BASIC tier) and issue tokens. */
@@ -34,6 +35,7 @@ class AuthService(
             subscriptionTier = SubscriptionTier.BASIC,
         )
         val saved = users.save(user)
+        emailVerificationService.sendVerification(saved)
         return tokensFor(saved)
     }
 

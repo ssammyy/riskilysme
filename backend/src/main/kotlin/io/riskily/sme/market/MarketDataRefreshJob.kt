@@ -29,6 +29,7 @@ class MarketDataRefreshJob(
     private val marketRepo: MarketDataRepository,
     private val cbkRates: CbkRateRepository,
     private val notices: RegulatoryNoticeRepository,
+    private val aiMarketFetcher: AiMarketFetcher,
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -41,7 +42,11 @@ class MarketDataRefreshJob(
             .onFailure { ex -> log.error("MarketDataRefreshJob: failed for {}", today, ex) }
     }
 
-    internal fun doRefresh(today: LocalDate) {
+    fun doRefresh(today: LocalDate) {
+        // Fetch live prices via Claude web_search and write to cbk_rates (single source of truth).
+        // If AI is unavailable the fallback reads whatever is already in cbk_rates.
+        aiMarketFetcher.fetchAndStore()
+
         val usdkes  = cbkRate("USD_KES")  ?: 130.5
         val cbk     = cbkRate("CBR")      ?: 12.5
         val fuel    = cbkRate("FUEL_KES") ?: 195.0

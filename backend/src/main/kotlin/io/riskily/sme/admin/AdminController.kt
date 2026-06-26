@@ -4,8 +4,12 @@ import io.riskily.sme.audit.AuditLog
 import io.riskily.sme.audit.AuditLogRepository
 import io.riskily.sme.audit.AuditService
 import io.riskily.sme.auth.AppUserDetails
+import io.riskily.sme.market.AiMarketFetcher
+import io.riskily.sme.market.MarketDataRefreshJob
+import io.riskily.sme.scoring.DailyScoreJob
 import io.riskily.sme.user.SubscriptionTier
 import io.riskily.sme.user.UserRepository
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -52,10 +56,8 @@ data class SetPreviewTierRequest(val tier: String?)
 
 data class PreviewTierResponse(val previewTier: String?)
 
-///**
-// * Admin portal API. Restricted to ADMIN role by SecurityConfig (/api/admin/**).
-// * Sprint 3 adds: user listing, tier management, and "preview as tier" session override.
-// */
+data class JobTriggerResponse(val triggered: Boolean, val startedAt: Instant)
+
 @RestController
 @RequestMapping("/api/admin")
 class AdminController(
@@ -63,7 +65,10 @@ class AdminController(
     private val auditLog: AuditLogRepository,
     private val auditService: AuditService,
     private val tierPreviewService: TierPreviewService,
+    private val dailyScoreJob: DailyScoreJob,
+    private val marketRefreshJob: MarketDataRefreshJob,
 ) {
+    private val log = LoggerFactory.getLogger(javaClass)
 
     @GetMapping("/overview")
     fun overview(): AdminOverviewResponse {
@@ -153,6 +158,44 @@ class AdminController(
     @GetMapping("/preview-tier")
     fun getPreviewTier(@AuthenticationPrincipal admin: AppUserDetails): PreviewTierResponse =
         PreviewTierResponse(tierPreviewService.getPreviewTier(admin.id)?.name?.lowercase())
+
+    /** Manually fires the 06:00 EAT daily-score job. Runs in a background thread. */
+    @PostMapping("/daily-score")
+    fun triggerDailyScore(@AuthenticationPrincipal admin: AppUserDetails): JobTriggerResponse {
+        log.info("Manual daily-score job triggered by {}", admin.username)
+        auditService.record(
+            action = "MANUAL_JOB_TRIGGER",
+            entity = "daily-score",
+            performedByOverride = admin.username,
+        )
+        Thread({
+            try {
+                dailyScoreJob.recalculateAll()
+            } catch (ex: Exception) {
+                log.error("Manual daily-score job failed", ex)
+            }
+        }, "manual-daily-score").start()
+        return JobTriggerResponse(triggered = true, startedAt = Instant.now())
+    }
+
+    /** Manually triggers a real-time market data refresh via AI web_search → cbk_rates. */
+    @PostMapping("/market-refresh")
+    fun triggerMarketRefresh(@AuthenticationPrincipal admin: AppUserDetails): JobTriggerResponse {
+        log.info("Manual market refresh triggered by {}", admin.username)
+        auditService.record(
+            action = "MANUAL_JOB_TRIGGER",
+            entity = "market-refresh",
+            performedByOverride = admin.username,
+        )
+        Thread({
+            try {
+                marketRefreshJob.doRefresh(java.time.LocalDate.now())
+            } catch (ex: Exception) {
+                log.error("Manual market refresh failed", ex)
+            }
+        }, "manual-market-refresh").start()
+        return JobTriggerResponse(triggered = true, startedAt = Instant.now())
+    }
 
     private fun AuditLog.toResponse() = AuditLogResponse(
         id = id ?: 0,

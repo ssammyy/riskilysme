@@ -17,9 +17,12 @@ export const sw: DeepPartial<Dictionary> = {
   nav: {
     dashboard: "Dashibodi",
     alerts: "Tahadhari",
+    deadlines: "Mwisho wa Muda",
+    insights: "Maarifa",
     settings: "Mipangilio",
     admin: "Msimamizi",
     menu: "Menyu",
+    riskModules: "Moduli za Hatari",
   },
   health: {
     title: "Muunganisho wa seva",
@@ -44,6 +47,7 @@ export const sw: DeepPartial<Dictionary> = {
       noAccount: "Mgeni Riskily?",
       signUpLink: "Fungua akaunti",
       error: "Hatukuweza kukuingiza. Angalia barua pepe na nywila yako.",
+      rememberMe: "Nikumbuke",
     },
     register: {
       title: "Fungua akaunti yako",
@@ -269,9 +273,16 @@ export const sw: DeepPartial<Dictionary> = {
       KEBS: "KEBS",
       OTHER: "Nyingine",
     },
+    pageSubtitle: "Fuatilia na tekeleza wajibu wako wa kisheria.",
     showMore: "Ona muda wote wa mwisho",
     basicLimit: "Inaonyesha 3 kati ya",
     empty: "Hakuna muda wa mwisho unaokuja.",
+    status: {
+      done: "Imekamilika",
+      inProgress: "Inaendelea",
+      remindMe: "Nikumbusha",
+    },
+    statusSaved: "Hali imesasishwa.",
   },
   marketData: {
     title: "Soko la leo",
